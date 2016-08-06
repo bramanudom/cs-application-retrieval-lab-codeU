@@ -60,8 +60,40 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch or(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+		// instantiated a newMap that will have the combined (or) search results
+       Map<String, Integer> returnMap = new HashMap<String, Integer> ();
+        
+        /*  iterate through one of the maps in the WikiSearch, checks for keys that are present 
+			in both WikiSearches and combines their values; adds new values and keys to returnMap
+			*/
+        for (String key: this.map.keySet()){
+        	if (that.map.containsKey(key)){
+        		Integer newValue = this.map.get(key) + that.map.get(key);
+        		//System.out.println("new combined value = " + newValue);
+        		returnMap.put(key, newValue);
+
+        	}
+        /* if the key is specific to one of the maps, add the entire entry to the returnMap
+        */
+
+        	else {
+        		returnMap.put(key,this.map.get(key));
+        	}
+        }
+
+        /* do the same for the other map */
+
+        for (String key: that.map.keySet()){
+        	if (!returnMap.containsKey(key)){
+        		returnMap.put(key, that.map.get(key));
+        	}
+        }
+
+   		//System.out.println(returnMap.entrySet());
+
+        return (new WikiSearch(returnMap));
+
+
 	}
 	
 	/**
@@ -71,8 +103,17 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch and(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+        Map<String, Integer> returnMap = new HashMap<String, Integer> ();
+        
+        for (String key: this.map.keySet()){
+        	if (that.map.containsKey(key)){
+        		Integer newValue = this.map.get(key) + that.map.get(key);
+        		returnMap.put(key, newValue);
+
+        	}
+		}
+
+		return (new WikiSearch(returnMap));
 	}
 	
 	/**
@@ -82,8 +123,15 @@ public class WikiSearch {
 	 * @return New WikiSearch object.
 	 */
 	public WikiSearch minus(WikiSearch that) {
-        // FILL THIS IN!
-		return null;
+       Map<String, Integer> returnMap = new HashMap<String, Integer> ();
+        
+        for (String key: this.map.keySet()){
+        	if (!that.map.containsKey(key)){
+        		returnMap.put(key, this.map.get(key));
+        	}
+		}
+
+		return (new WikiSearch(returnMap));
 	}
 	
 	/**
@@ -98,14 +146,36 @@ public class WikiSearch {
 		return rel1 + rel2;
 	}
 
+	public int compareTo(Entry<String, Integer> that) {
+		Entry<String, Integer> thisEntry = this.map;
+		Integer thisV = thisEntry.getValue();
+		Integer thatV = that.getValue();
+		if (thisV > thatV ){
+			return 1;
+		} 
+		else if (thisV < thatV){
+			return -1;
+	
+		} else{
+			return 0;
+
+		}
+	}
+
 	/**
 	 * Sort the results by relevance.
 	 * 
 	 * @return List of entries with URL and relevance.
 	 */
 	public List<Entry<String, Integer>> sort() {
-        // FILL THIS IN!
-		return null;
+		// List<Entry<String, Integer>> result = new LinkedList<Entry<String, Integer>>();
+		// for (Entry<String, Integer> entry: this.map.entrySet()){
+		// 	result.add(entry);
+		// }
+		List<Entry<String, Integer>> result = this.map.entrySet();
+		Collections.sort(result);
+		return result;
+
 	}
 
 	/**
@@ -123,24 +193,29 @@ public class WikiSearch {
 	public static void main(String[] args) throws IOException {
 		
 		// make a JedisIndex
-		Jedis jedis = JedisMaker.make();
-		JedisIndex index = new JedisIndex(jedis); 
+		// Jedis jedis = JedisMaker.make();
+		// JedisIndex index = new JedisIndex(jedis); 
 		
-		// search for the first term
-		String term1 = "java";
-		System.out.println("Query: " + term1);
-		WikiSearch search1 = search(term1, index);
-		search1.print();
+		// // search for the first term
+		// String term1 = "java";
+		// System.out.println("Query: " + term1);
+		// WikiSearch search1 = search(term1, index);
+		// search1.print();
 		
-		// search for the second term
-		String term2 = "programming";
-		System.out.println("Query: " + term2);
-		WikiSearch search2 = search(term2, index);
-		search2.print();
-		
+		// // search for the second term
+		// String term2 = "programming";
+		// System.out.println("Query: " + term2);
+		// WikiSearch search2 = search(term2, index);
+		// search2.print();
+
+		HashMap<String, Integer> hi = new HashMap<String, Integer> ();
+		hi.put("a", 1);
+		hi.put("b", 1);
+
+			
 		// compute the intersection of the searches
-		System.out.println("Query: " + term1 + " AND " + term2);
-		WikiSearch intersection = search1.and(search2);
-		intersection.print();
+		// System.out.println("Query: " + term1 + " AND " + term2);
+		// WikiSearch intersection = search1.and(search2);
+		// intersection.print();
 	}
 }
